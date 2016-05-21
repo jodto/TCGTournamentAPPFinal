@@ -1,0 +1,106 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UI.Fragments.DetailsFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="70px"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Tournament Title"
+            android:id="@+id/txtDetailsTitle" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="50px"
+            android:textSize="50px"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Tournament Date"
+            android:id="@+id/txtDetailsDate" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="45px"
+            android:paddingBottom="20px"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Tournament info"
+            android:id="@+id/txtInfo" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="20px"
+            android:textSize="45px"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Tournament Location"
+            android:id="@+id/txtLocation" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="45px"
+            android:paddingBottom="20px"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Tournament format"
+            android:id="@+id/txtFormat" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="45px"
+            android:paddingBottom="20px"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Tournament edition"
+            android:id="@+id/txtEdition" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="45px"
+            android:paddingBottom="20px"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Tournament rel"
+            android:id="@+id/txtRel" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="45px"
+            android:paddingBottom="20px"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Tournament price"
+            android:id="@+id/txtPrice" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="45px"
+            android:paddingBottom="20px"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Tournament entrytime"
+            android:id="@+id/txtEntryTime" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="45px"
+            android:paddingBottom="20px"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Tournament starttime"
+            android:id="@+id/txtStarTtime" />
+    </LinearLayout>
+
+</FrameLayout>
