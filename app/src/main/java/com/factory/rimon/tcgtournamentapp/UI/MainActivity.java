@@ -2,8 +2,6 @@ package com.factory.rimon.tcgtournamentapp.UI;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -24,12 +22,14 @@ import android.widget.Toast;
 import com.factory.rimon.tcgtournamentapp.BE.BETournament;
 import com.factory.rimon.tcgtournamentapp.DAL.DAO;
 import com.factory.rimon.tcgtournamentapp.DAL.TournamentRepository;
+import com.factory.rimon.tcgtournamentapp.InternetHelper;
 import com.factory.rimon.tcgtournamentapp.R;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     ListView lvTournaments;
+
 
     TournamentRepository tRepo;
     TournamentAdapter tAdapter;
@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         tRepo = new TournamentRepository();
         lvTournaments.setAdapter(tAdapter);
         mainLayout =  (LinearLayout)findViewById(R.id.layout);
+        populateTournaments();
 
         lvTournaments.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -72,41 +73,29 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        populateTournaments();
     }
 
 
 
 
     /*
-     populates the listview depending on if the internet is on or not and if the databse is empty or not
+     populates the listview depending on if the internet is on or not and if the database is empty or not
      */
     public void populateTournaments() {
-        if (dao.selectAll().size() == 0 && isNetworkAvailable()) {
+        if(dao.isDatabaseEmpty() && InternetHelper.isNetworkAvailable(this)){
             new LoadDataTask().execute(nextPage);
         }
-        else if(dao.selectAll().size() == 0 && !isNetworkAvailable())
+        else if(dao.isDatabaseEmpty() && !InternetHelper.isNetworkAvailable(this))
         {
             Toast.makeText(getApplicationContext(), "NO INTERNET CONNECTION", Toast.LENGTH_SHORT).show();
             lvTournaments.setVisibility(View.GONE);
-            addRetryButton();
+            addRetryButton(this);
         }
-        else if(dao.selectAll().size() != 0 && !isNetworkAvailable())
+        else if(!dao.isDatabaseEmpty() && !InternetHelper.isNetworkAvailable(this))
         {
             tAdapter.addAll(dao.selectAll());
-
         }
 
-    }
-
-    /*
-    checking if the phone is connected to the internet
-     */
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     /*
@@ -139,19 +128,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*
-        would either send the mongoId to the tabAcivity if internet is on so it can get the tournament fresh from the DB
+        would either send the mongoid to the tabAcivity if internet is on so it can get the tournament fresh from the DB
         Or if internet is not on, it just sends over what it has in the database
      */
     public void onClickTournament(int position){
         BETournament tournament = tAdapter.getItem(position);
         Intent intent = new Intent(getApplicationContext(), TabActivity.class);
-        if(!isNetworkAvailable()) {
+        if(!InternetHelper.isNetworkAvailable(this)) {
             intent.putExtra("tournament", tournament);
             startActivity(intent);
         }
         else
         {
-            intent.putExtra("mongoid", tournament.getMongoId());
+            intent.putExtra("mongoid", tournament.getId());
             startActivity(intent);
         }
     }
@@ -165,11 +154,10 @@ public class MainActivity extends AppCompatActivity {
 
         //If we are at bottom at the page and not loading, load more data
         if (loadMore && !loading) {
-            if (isNetworkAvailable()) {
+            if (InternetHelper.isNetworkAvailable(this)) {
                 Log.d("TOURNAMENTS", "onScroll page to load = " + nextPage);
                 new LoadDataTask().execute(nextPage);
                 loading = true;
-                Log.d("AMOUNT OF TOURNAMENT DB", dao.selectAll().size() + "");
                 nextPage++;
             } else {
                 Toast.makeText(getApplicationContext(), "NO INTERNET CONNECTION", Toast.LENGTH_SHORT).show();
@@ -181,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
     /*
         creates adds the retry button used in populateTournaments()
      */
-    public void addRetryButton()
+    public void addRetryButton(final Context context)
     {
         btnRetry = new Button(this);
         btnRetry.setText("retry");
@@ -195,9 +183,8 @@ public class MainActivity extends AppCompatActivity {
 
         btnRetry.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
-                if (isNetworkAvailable()) {
+            public void onClick(View v) {
+                if (InternetHelper.isNetworkAvailable(context)) {
                     mainLayout.removeView(btnRetry);
                     lvTournaments.setVisibility(View.VISIBLE);
                     new LoadDataTask().execute(nextPage);
@@ -216,15 +203,10 @@ public class MainActivity extends AppCompatActivity {
     class LoadDataTask extends AsyncTask<Integer, Void, List<BETournament>> {
         @Override
         protected List<BETournament> doInBackground(Integer... page) {
-            for(BETournament t : tRepo.loadPage(page[0]))
-            {
-                for (int i = 0; i < dao.selectAll().size();i++)
-                {
-                    if (dao.selectAll().get(i).getMongoId() != t.getMongoId()) {
-                        dao.insert(t);
-                    }
+             for (BETournament t : tRepo.loadPage(page[0])) {
+                    dao.insert(t);
                 }
-            }
+
             return tRepo.loadPage(page[0]);
         }
 
@@ -233,8 +215,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<BETournament> beTournaments) {
             tAdapter.addAll(beTournaments);
-            Log.d("MainActivity", "amount in array:"+ beTournaments.size());
             loading = false;
+            System.out.println("AMOUNT " + dao.selectAll().size());
         }
     }
 }

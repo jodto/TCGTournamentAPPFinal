@@ -24,37 +24,38 @@ public class DAO {
     private static final String DATABASE_NAME = "tournament.db";
     private static final int DATABASE_VERSION = 1;
     private static final String TABLE_NAME = "Tournament";
-
+    private OpenHelper openHelper;
     private Context context;
 
     private SQLiteDatabase db;
     private SQLiteStatement insertStmt;
     private static final String INSERT = "insert into " + TABLE_NAME
-            + " (title, date, location, edition, rel, format, entryTime, startTime, price, info, players, mongoid) values (?,?,?,?,?,?,?,?,?,?,?,?)";
+            + " (id, title, date, location, edition, rel, format, entryTime, startTime, price, info, players) values (?,?,?,?,?,?,?,?,?,?,?,?)";
 
 
     public DAO(Context context) {
         this.context = context;
-        OpenHelper openHelper = new OpenHelper(this.context);
+        openHelper = new OpenHelper(this.context);
         this.db = openHelper.getWritableDatabase();
         this.insertStmt = this.db.compileStatement(INSERT);
     }
 
     /*
-        inserts a enw tournament into the database
+        inserts a new tournament into the database
      */
     public long insert(BETournament t) {
 
-                this.insertStmt.bindString(1, t.getTitle());
-                this.insertStmt.bindString(2, t.getDate());
-                this.insertStmt.bindString(3, t.getLocation());
-                this.insertStmt.bindString(4, t.getEdition());
-                this.insertStmt.bindString(5, t.getRel());
-                this.insertStmt.bindString(6, t.getFormat());
-                this.insertStmt.bindString(7, t.getEntryTime());
-                this.insertStmt.bindString(8, t.getStartTime());
-                this.insertStmt.bindString(9, t.getPrice());
-                this.insertStmt.bindString(10, t.getInfo());
+                this.insertStmt.bindString(1, t.getId());
+                this.insertStmt.bindString(2, t.getTitle());
+                this.insertStmt.bindString(3, t.getDate());
+                this.insertStmt.bindString(4, t.getLocation());
+                this.insertStmt.bindString(5, t.getEdition());
+                this.insertStmt.bindString(6, t.getRel());
+                this.insertStmt.bindString(7, t.getFormat());
+                this.insertStmt.bindString(8, t.getEntryTime());
+                this.insertStmt.bindString(9, t.getStartTime());
+                this.insertStmt.bindString(10, t.getPrice());
+                this.insertStmt.bindString(11, t.getInfo());
 
                 try {
 
@@ -69,19 +70,16 @@ public class DAO {
                             jsonArray.put(player);
                         }
 
-                        this.insertStmt.bindString(11, jsonArray.toString());
+                        this.insertStmt.bindString(12, jsonArray.toString());
                     }
                     else
                     {
-                        this.insertStmt.bindString(11, "no players");
+                        this.insertStmt.bindString(12, "no players");
                     }
-
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                this.insertStmt.bindString(12, t.getMongoId());
-
 
         return this.insertStmt.executeInsert();
     }
@@ -93,7 +91,7 @@ public class DAO {
     */
     public List<BETournament> selectAll()  {
         List<BETournament> list = new ArrayList<BETournament>();
-        Cursor cursor = this.db.query(TABLE_NAME, new String[] { "id", "title", "date", "location", "edition", "rel", "format", "entryTime", "startTime", "price", "info", "players", "mongoid"},
+        Cursor cursor = this.db.query(TABLE_NAME, new String[] { "id", "title", "date", "location", "edition", "rel", "format", "entryTime", "startTime", "price", "info", "players"},
                 null, null, null, null, "title asc");
         if (cursor.moveToFirst()) {
             do {
@@ -101,33 +99,30 @@ public class DAO {
 
                 try
                 {
-
-
-                if(!cursor.getString(11).equals("no players")) {
-                    //JSONObject json = new JSONObject(cursor.getString(11));
+                    if(!cursor.getString(11).equals("no players")) {
                     JSONArray jsonList = new JSONArray(cursor.getString(11));
 
-                    for (int i = 0; i < jsonList.length(); i++) {
-                        JSONObject oPlayer = jsonList.getJSONObject(i);
-                        BEPlayer p = new BEPlayer(
-                                oPlayer.getString("firstName")
-                                , oPlayer.getString("lastName")
-                                , oPlayer.getString("DCI")
-                                , oPlayer.getString("email")
-                        );
+                        for (int i = 0; i < jsonList.length(); i++) {
+                            JSONObject oPlayer = jsonList.getJSONObject(i);
+                            BEPlayer p = new BEPlayer(
+                                    oPlayer.getString("firstName")
+                                    , oPlayer.getString("lastName")
+                                    , oPlayer.getString("DCI")
+                                    , oPlayer.getString("email")
+                            );
 
-                        playerList.add(p);
+                            playerList.add(p);
+                        }
                     }
                 }
 
-                }
                 catch (JSONException e) {
                     e.printStackTrace();
                 }
 
 
                 list.add(new BETournament(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4)
-                        , cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getString(8), cursor.getString(9), cursor.getString(10), playerList, cursor.getString(12)));
+                        , cursor.getString(5), cursor.getString(6), cursor.getString(7), cursor.getString(8), cursor.getString(9), cursor.getString(10), playerList));
             } while (cursor.moveToNext());
         }
         if (cursor != null && !cursor.isClosed()) {
@@ -136,10 +131,25 @@ public class DAO {
         return list;
     }
 
+    /*
+        return true or false depended on if the database is empty
+     */
+    public boolean isDatabaseEmpty(){
 
+        SQLiteDatabase db = openHelper.getWritableDatabase();
+        String count = "SELECT count(*) FROM " + TABLE_NAME;
+        Cursor mcursor = db.rawQuery(count, null);
+        mcursor.moveToFirst();
+        int icount = mcursor.getInt(0);
+        if(icount>0)
+            return false;
+        else
+            return true;
+    }
 
-
-
+    /*
+        helper class to create and upgrade the database
+     */
     private static class OpenHelper extends SQLiteOpenHelper {
 
         OpenHelper(Context context)
@@ -150,7 +160,7 @@ public class DAO {
         @Override
         public void onCreate(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE " + TABLE_NAME
-                    + "( id TEXT PRIMARY KEY,title TEXT,date TEXT, location TEXT, edition TEXT, rel TEXT, format TEXT, entryTime TEXT, startTime TEXT, price TEXT, info TEXT, players TEXT, mongoid TEXT)");
+                    + "( id TEXT,title TEXT,date TEXT, location TEXT, edition TEXT, rel TEXT, format TEXT, entryTime TEXT, startTime TEXT, price TEXT, info TEXT, players TEXT)");
         }
 
         @Override

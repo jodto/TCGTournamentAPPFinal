@@ -1,6 +1,5 @@
 package com.factory.rimon.tcgtournamentapp.UI;
 
-import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -15,7 +14,6 @@ import com.factory.rimon.tcgtournamentapp.UI.Fragments.SignUpFragment;
  */
 public class PageAdapter extends FragmentPagerAdapter {
 
-    Intent intent;
     BETournament tournament;
 
     public PageAdapter(FragmentManager fm, BETournament tournament) {
@@ -24,7 +22,7 @@ public class PageAdapter extends FragmentPagerAdapter {
     }
 
     /*
-        sets the fragments assosiated to each tab
+        sets the fragments associated to each tab
      */
     @Override
     public Fragment getItem(int position) {

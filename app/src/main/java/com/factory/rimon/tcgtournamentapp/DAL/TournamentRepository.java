@@ -21,7 +21,7 @@ import java.util.Scanner;
  * Created by rimon on 4/29/2016.
  */
 public class TournamentRepository {
-    private final String URL = "http://tcgtournament-nikolaj.rhcloud.com/api/tournaments";
+    private final String URL = "http://tcg-limitedevents.rhcloud.com/api/tournaments";
 
     private final String TAG = "TOURNAMENT";
 
@@ -40,9 +40,11 @@ public class TournamentRepository {
                 return null;
             }
             return getTournaments(result);
-
     }
 
+    /*
+        gets one specific tournament, depended on the mongoid it was given
+     */
     public BETournament getOneTournament(String mongoId){
         String result = getContent(URL + "/" + mongoId);
         BETournament returnedTournament = null;
@@ -67,7 +69,6 @@ public class TournamentRepository {
 
                             players.add(p);
                         }
-
                 }
 
                 if(players == null){
@@ -77,7 +78,7 @@ public class TournamentRepository {
                 returnedTournament = createTournament(jsonTournament, players);
             }
 
-            Log.d("playersss", returnedTournament.getPlayers().size() + "");
+            Log.d("Amount of players: ", returnedTournament.getPlayers().size() + "");
             return returnedTournament;
         }
         catch(JSONException e) {
@@ -88,6 +89,9 @@ public class TournamentRepository {
         return returnedTournament;
     }
 
+    /*
+        gets mutiple tournaments from the specific page
+     */
     public ArrayList<BETournament> getTournaments(String result){
         try
         {
@@ -123,6 +127,7 @@ public class TournamentRepository {
                 }
 
                 BETournament t = createTournament(o, players);
+
                 myList.add(t);
         }
         Log.d("Repository:", "amount in array" + myList.size());
@@ -136,7 +141,6 @@ public class TournamentRepository {
     return null;
     }
 
-   // public ArrayList<BETournament> getAll(){return tournaments;}
 
     /**
      * Get the content of the url as a string. Based on using a scanner.
@@ -172,7 +176,7 @@ public class TournamentRepository {
     public BETournament createTournament(JSONObject json, ArrayList<BEPlayer> playerList) throws JSONException
     {
         BETournament tournament = new BETournament(
-                json.getString("_id")
+                 json.getString("_id")
                 , json.getString("title")
                 , json.getString("location")
                 , json.getString("date")
@@ -183,8 +187,7 @@ public class TournamentRepository {
                 , json.getString("entryTime")
                 , json.getString("startTime")
                 , json.getString("info")
-                , playerList
-                , json.getString("_id"));
+                , playerList);
         return tournament;
     }
 
@@ -192,11 +195,11 @@ public class TournamentRepository {
     /*
         sends out a PUT request to the database to update a tournament's players
      */
-    public void updateTournament(String player, String mongoId) {
+    public void updateTournament(String player, String id) {
         try {
 
             //make new URL with the specififed id of the tournament
-            URL url = new URL(URL + "/" + mongoId);
+            URL url = new URL(URL + "/" + id);
             String result = getContent(url.toString());
 
             //get the the tournament information and get the current players of that tournament
@@ -228,11 +231,6 @@ public class TournamentRepository {
             out.flush();
             out.close();
 
-            //just some testing
-            System.out.println("THISTHIS " + httpCon.getResponseCode());
-            System.out.println("THISTHIS " + httpCon.getResponseMessage());
-            System.out.println("THISTHIS " + httpCon.getErrorStream());
-            System.out.println("THISTHIS " + "{players:" + currentPlayers.toString() + "}");
 
         } catch (MalformedURLException ex) {
 

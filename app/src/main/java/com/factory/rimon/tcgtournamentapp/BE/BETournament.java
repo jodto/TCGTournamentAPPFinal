@@ -20,7 +20,6 @@ public class BETournament implements Serializable{
     String price;
     String info;
     ArrayList<BEPlayer> players;
-    String mongoId;
 
     public BETournament(String id
             , String title
@@ -33,8 +32,7 @@ public class BETournament implements Serializable{
             , String entryTime
             , String startTime
             , String info
-            , ArrayList<BEPlayer> players
-            , String mongoId)
+            , ArrayList<BEPlayer> players)
     {
         this.id = id;
         this.title = title;
@@ -49,7 +47,6 @@ public class BETournament implements Serializable{
         this.price = price;
         this.info = info;
         this.players = players;
-        this.mongoId = mongoId;
     }
 
     public String getId() {
@@ -100,8 +97,5 @@ public class BETournament implements Serializable{
         return players;
     }
 
-    public String getMongoId() {
-        return mongoId;
-    }
 
 }

@@ -1,6 +1,9 @@
 package com.factory.rimon.tcgtournamentapp.UI.Fragments;
 
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,6 +16,7 @@ import android.widget.Toast;
 
 import com.factory.rimon.tcgtournamentapp.BE.BETournament;
 import com.factory.rimon.tcgtournamentapp.DAL.TournamentRepository;
+import com.factory.rimon.tcgtournamentapp.InternetHelper;
 import com.factory.rimon.tcgtournamentapp.R;
 
 /**
@@ -25,7 +29,6 @@ public class SignUpFragment extends Fragment {
     TextView txtLastName;
     TextView txtDCI;
     TextView txtEmail;
-    String player = "";
     static BETournament tournament;
 
     public SignUpFragment() {
@@ -44,7 +47,7 @@ public class SignUpFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         final View view = inflater.inflate(R.layout.fragment_sign_up, container, false);
         txtFirstName = (TextView) view.findViewById(R.id.txtFirstName);
         txtLastName = (TextView) view.findViewById(R.id.txtLastName);
@@ -63,8 +66,8 @@ public class SignUpFragment extends Fragment {
                     Toast.makeText(view.getContext(), "Fill out all information ", Toast.LENGTH_SHORT).show();
 
                 } else {
-                    new signUpPlayer().execute("{\"firstName\": \"" + txtFirstName.getText() + "\", \"lastName\": \"" + txtLastName.getText() + "\", \"DCI\":\"" + txtDCI.getText() + "\", \"email\":\"" + txtEmail.getText() + "\"}");
-                    Toast.makeText(view.getContext(), "Signed Up ", Toast.LENGTH_SHORT).show();
+                    new signUpPlayer().execute("{\"firstName\": \"" + txtFirstName.getText() + "\", \"lastName\": \"" + txtLastName.getText()
+                            + "\", \"DCI\":\"" + txtDCI.getText() + "\", \"email\":\"" + txtEmail.getText() + "\"}");
                 }
             }
         });
@@ -73,19 +76,30 @@ public class SignUpFragment extends Fragment {
     }
 
 
+
     class signUpPlayer extends AsyncTask<String, Void, Void> {
         @Override
         protected Void doInBackground(String... params) {
-            tRepo.updateTournament(params[0], tournament.getMongoId());
+            if(InternetHelper.isNetworkAvailable(getActivity())) {
+                tRepo.updateTournament(params[0], tournament.getId());
+            }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void beTournaments) {
-            txtFirstName.setText("");
-            txtLastName.setText("");
-            txtDCI.setText("");
-            txtEmail.setText("");
+            if(InternetHelper.isNetworkAvailable(getActivity())) {
+                txtFirstName.setText("");
+                txtLastName.setText("");
+                txtDCI.setText("");
+                txtEmail.setText("");
+                Toast.makeText(getActivity(), "Signed Up ", Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                Toast.makeText(getActivity(), "NO INTERNET CONNECTION", Toast.LENGTH_SHORT).show();
+            }
+
         }
     }
 

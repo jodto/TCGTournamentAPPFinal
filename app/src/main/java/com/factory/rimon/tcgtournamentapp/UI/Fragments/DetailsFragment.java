@@ -39,7 +39,7 @@ public class DetailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         View view = inflater.inflate(R.layout.fragment_details, container, false);
         TextView txtTitle = (TextView) view.findViewById(R.id.txtDetailsTitle);
         TextView txtDate = (TextView) view.findViewById(R.id.txtDetailsDate);
@@ -63,24 +63,7 @@ public class DetailsFragment extends Fragment {
         txtEdition.setText("Edition: " + tournament.getEdition());
         txtPrice.setText("Price: " + tournament.getPrice() + "$");
 
-        //return inflater.inflate(R.layout.fragment_details, container, false);
         return view;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-
-        /*TextView txtLoc = (TextView) findViewById(R.id.txtDetailsLocation);
-        TextView txtStart = (TextView) findViewById(R.id.txtDetailsStart);
-        TextView txtEnd = (TextView) findViewById(R.id.txtDetailsEnd);
-        ListView lvPlayers = (ListView) findViewById(R.id.lvDetailsPlayers);*/
-
-
-        //txtLoc.setText(t.getLocation());
-        //txtStart.setText(t.getStartTime());
-        //txtEnd.setText(t.getEndTime());
-
-    }
 }

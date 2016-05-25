@@ -46,7 +46,7 @@ public class TabActivity extends AppCompatActivity {
     }
 
     /*
-        runs in the background, receiving a player form the databse
+        runs in the background, receiving a player form the database
     */
     class signUpPlayer extends AsyncTask<Intent, Void, BETournament> {
 
@@ -66,7 +66,7 @@ public class TabActivity extends AppCompatActivity {
     /*
         Method sets up the tabs, reason why we do this in a method and not directly in the oncreate its because it is needed in two places
         If you were to have this only in the OnCreate, the background thread of SignUpPlayer would not finish before the tabs are set up
-        leading to a nullpointerexception because the tournament its null, because the thread coulkd no retrieve it form the DB fast enough
+        leading to a nullpointerexception because the tournament its null, because the thread could no retrieve it form the DB fast enough
     */
     private void setUpTabs()
     {

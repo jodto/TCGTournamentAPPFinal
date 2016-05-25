@@ -7,7 +7,6 @@ import java.io.Serializable;
  */
 public class BEPlayer implements Serializable
 {
-        //Testing class, replaved by account system later
         String firstName;
         String lastName;
         String DCI;
